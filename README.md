@@ -10,6 +10,27 @@ dicionário das colunas em [docs/dicionario.md](docs/dicionario.md).
 
 Cada linha do resultado: `ano, mes, id_municipio_residencia, internacoes_agressao`.
 
+## Os dados (para colaboradores)
+
+Os CSVs já estão versionados em [`data/`](data/) — **não precisa rodar nada nem
+saber programar**. Baixe direto pelo GitHub: botão verde **Code → Download ZIP**,
+ou abra o arquivo e clique em **Download raw file**.
+
+- [`data/internacoes_agressao_munic_mes_ate17.csv`](data/internacoes_agressao_munic_mes_ate17.csv)
+  — painel balanceado, 1 linha por município × mês:
+
+  | Coluna | Descrição |
+  |---|---|
+  | `ano`, `mes` | competência da internação |
+  | `id_municipio_residencia` | código IBGE de **6 dígitos** (residência do paciente) |
+  | `internacoes_agressao` | nº de internações por agressão (X85–Y09), ≤17 anos; **0** onde não houve |
+
+- [`data/completude_causa_externa_uf_ano.csv`](data/completude_causa_externa_uf_ano.csv)
+  — % das internações por lesão com causa externa registrada, por UF/ano
+  (diagnóstico de qualidade do dado).
+
+> O painel balanceado tem ~935 mil linhas (muito zero). Abre no Excel, mas pesa.
+
 ## Estrutura
 
 ```
@@ -31,25 +52,53 @@ sih_agressoes/
     └── completude_causa_externa_uf_ano.csv        # qualidade do registro
 ```
 
-## Uso
+## Uso (para regenerar os dados)
+
+Só é necessário se você for **regenerar** os CSVs. Exige projeto GCP com
+faturamento (quem só quer os dados, veja a seção acima).
 
 ```bash
 pip install basedosdados pandas pandas-gbq pyarrow python-dotenv
 gcloud auth application-default login
-# coloque BILLING_PROJECT_ID no .env
-
-python scripts/main.py                # default: all (extrair + completude)
-python scripts/main.py inspect        # confere o esquema da tabela
-python scripts/main.py extrair        # extração principal (2009–2022)
-python scripts/main.py completude     # qualidade do registro
-python scripts/main.py diagnostico    # investigação da quebra de 2015
-python scripts/main.py all            # extrair + completude
+# crie um .env na raiz com:  BILLING_PROJECT_ID=seu-projeto-gcp
 ```
 
-Opções: `--start-year`, `--end-year`, `--idade-max`, `--billing-project`,
-`--output`. O billing vem do `.env`; os caminhos são resolvidos sozinhos
-(rode de onde quiser). Saída principal:
-`data/internacoes_agressao_munic_mes_ate17.csv`.
+### Comandos
+
+| Comando | O que faz |
+|---|---|
+| `python scripts/main.py` | **default:** `all` (extrair + completude) |
+| `python scripts/main.py extrair` | extração principal → `data/...ate17.csv` |
+| `python scripts/main.py completude` | qualidade do registro → `data/completude_...csv` |
+| `python scripts/main.py diagnostico` | investigação da quebra de 2015 (só imprime) |
+| `python scripts/main.py inspect` | esquema da tabela (só imprime) |
+| `python scripts/main.py all` | extrair + completude |
+
+### Opções
+
+| Opção | Default | Descrição |
+|---|---|---|
+| `--start-year` | `2009` | ano inicial (2008 vem vazio no bd) |
+| `--end-year` | `2022` | ano final |
+| `--idade-max` | `17` | idade máxima (anos); define o filtro **e** o nome do arquivo (`...ate17.csv`) |
+| `--balancear` / `--no-balancear` | balancear | painel completo (municípios × meses, zeros) vs só células com ≥1 internação |
+| `--output` | `data/...ate{idade}.csv` | caminho de saída |
+| `--billing-project` | do `.env` | projeto GCP com faturamento |
+
+Os caminhos são resolvidos sozinhos — rode de onde quiser.
+
+### Exemplos
+
+```bash
+# outro recorte etário (gera ...ate12.csv)
+python scripts/main.py extrair --idade-max 12
+
+# versão enxuta: só células com internação (~40k linhas, abre fácil no Excel)
+python scripts/main.py extrair --no-balancear
+
+# um ano só, para teste rápido
+python scripts/main.py extrair --start-year 2022 --end-year 2022
+```
 
 ## Decisões embutidas (e como ajustar)
 
