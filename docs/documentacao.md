@@ -107,6 +107,11 @@ Medida via `--completude`: dentre as internações por lesão (CID principal S/T
 % com causa externa (V–Y) registrada nos campos secundários. UF derivada de
 `SUBSTR(id_municipio_paciente, 1, 2)` (pois `sigla_uf` vem vazio — ver dicionário).
 
+> **Sem filtro de idade (de propósito).** A completude é medida sobre todas as
+> idades, não só ≤17. É um termômetro geral da qualidade de codificação:
+> all-ages dá muito mais observações e estabiliza o % em células UF×ano
+> pequenas. O desfecho continua sendo ≤17; isto aqui é só diagnóstico do dado.
+
 **Boa notícia:**
 - Completude **nacional alta e estável**: 89–97% (a perda por subnotificação do
   campo é pequena).

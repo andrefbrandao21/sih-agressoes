@@ -79,7 +79,12 @@ def query_inspecao():
 
 def query_completude(ano):
     """% de internações por lesão (S/T) com causa externa (V–Y) registrada nos
-    campos secundários, por UF (derivada do código do município)."""
+    campos secundários, por UF (derivada do código do município).
+
+    Sem filtro de idade de propósito: é um termômetro geral de qualidade de
+    codificação (all-ages), priorizando poder estatístico/estabilidade em
+    células UF×ano pequenas. Não confundir com o desfecho, que é ≤17 anos.
+    """
     lesao = "SUBSTR(cid_principal_subcategoria, 1, 1) IN ('S','T')"
     tem_causa = " OR ".join(
         f"SUBSTR({c}, 1, 1) IN ('V','W','X','Y')" for c in config.COLS_CID_SUBCATEGORIA)
