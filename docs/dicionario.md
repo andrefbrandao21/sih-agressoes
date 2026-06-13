@@ -149,3 +149,11 @@ Cada CID vem **dividido** em `categoria` (3 chars, ex.: `X85`) e `subcategoria`
 5. **`idade_paciente` exige a unidade.** Sem ela, "11" pode ser 11 anos, meses ou
    dias. Resolva pelo dicionário de `unidade_medida_idade_paciente`.
 6. **2008 vem vazio** no basedosdados; cobertura efetiva 2009+.
+7. **5.571 municípios, não 5.570.** O diretório `br_bd_diretorios_brasil.municipio`
+   (universo do balanceamento) tem 5.571 unidades, todas com código válido. O
+   "extra" é **Fernando de Noronha** (`260545` / PE), distrito estadual com código
+   de nível municipal — não é um dos 5.570 *municípios*, mas entra na malha do
+   IBGE/DATASUS. Logo: 5.570 municípios + Noronha = 5.571. Mantemos no painel
+   (é território habitado). **Não confundir** com os ~1.071 registros descartados
+   no balanceamento: aqueles são códigos de residência inválidos/ignorados que
+   vêm do *SIH* (ex.: `000000`), não do diretório — ver `documentacao.md` §6.
